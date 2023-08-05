@@ -21,9 +21,6 @@ class BotFilter(BotJoinGroup):
         if callback_data and callback_data[0].from_id:
             bot_id = int(callback_data[0].from_id.user_id)
             result = await self.db_methods.get_from_db_by_bot_id(bot_id)
-            if not result:
-                print("Bot not added to database")
-                return
             try:
                 await self.captcha_methods.__getattribute__(result)(
                     callback_data, channel
@@ -34,7 +31,7 @@ class BotFilter(BotJoinGroup):
             print("No callback data received")
 
     async def get_captcha_message(self, bot_ids):
-        @self.client.on(telethon.events.NewMessage())
+        @self.client.on(telethon.events.NewMessage(from_users=bot_ids))
         async def handler(event):
             self.event = event
             await self.client.disconnect()
